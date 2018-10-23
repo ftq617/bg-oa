@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bluegod.dao.DepartmentMapper">
+    <insert id="addDepartment" parameterType="department">
+        insert into department(dName,uId,uName,createTime,status) values(#{dName},#{uId},#{uName},#{createTime},#{status})
+    </insert>
+    <select id="getDepartmentList" resultType="department">
+        select * from department
+    </select>
+    <select id="getDepartmentByName" resultType="department">
+        select * from department where dName=#{dName}
+    </select>
+    <select id="getDepartmentById" resultType="department">
+        select * from department where id=#{id}
+    </select>
+
+    <update id="updateDepartment" parameterType="department">
+        update department
+        <set>
+            <if test="dName!=null and dName!=''">dName=#{dName},</if>
+            <if test="uId!=null and uId!=0">#{uId},</if>
+            <if test="uName!=null and uName!=''">#{uName},</if>
+            <if test="status!=null and status!=0">status=#{status},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="deleteDepartment">
+        delete from department where id in
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

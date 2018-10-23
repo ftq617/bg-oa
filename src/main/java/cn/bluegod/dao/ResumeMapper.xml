@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bluegod.dao.ResumeMapper">
+        <insert id="addResume" parameterType="resume">
+            insert into resume(uId,name,sex,age,salary,education,phone,email,major,introduce) values(#{uId},#{name},#{sex,},#{age},#{salary},#{education},#{phone},#{email},#{major},#{introduce})
+        </insert>
+
+    <update id="updateResume" parameterType="resume">
+        update resume
+        <set>
+            <if test="name!=null and name!=''">name=#{name},</if>
+            <if test="sex!=null">sex=#{sex},</if>
+            <if test="age!=null">age=#{age},</if>
+            <if test="education!=null">education=#{education},</if>
+            <if test="salary!=null">salary=#{salary},</if>
+            <if test="phone!=null and phone!=''">phone=#{phone},</if>
+            <if test="email!=null and email!=''">email=#{email},</if>
+            <if test="major!=null and major!=''">major=#{major},</if>
+            <if test="introduce!=null and introduce!=''">introduce=#{introduce},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="deleteResume" parameterType="resume">
+        delete from resume where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getResumeById" resultType="resume">
+        select * from resume where id=#{id}
+    </select>
+
+    <select id="getResumeByU_id" resultType="resume">
+        select * from resume where uId=#{id}
+    </select>
+
+    <select id="getResumeByIds" resultType="resume">
+        select * from resume where id in
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+</mapper>

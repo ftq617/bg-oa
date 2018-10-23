@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bluegod.dao.UserMapper">
+    <resultMap id="user" type="user">
+        <id column="id" property="id"/>
+        <result column="user_name" property="userName"/>
+        <result column="image" property="image"/>
+        <result column="phone" property="phone"/>
+        <result column="password" property="password"/>
+        <result column="job_id" property="jobId"/>
+        <result column="job_name" property="jobName"/>
+        <result column="number" property="number"/>
+        <result column="department_id" property="departmentId"/>
+        <result column="department_Name" property="departmentName"/>
+        <result column="sex" property="sex"/>
+        <result column="recruit_id" property="recruit_id"/>
+        <result column="type" property="type"/>
+        <result column="salary" property="salary"/>
+        <result column="create_time" property="createTime"/>
+        <result column="join_time" property="joinTime"/>
+    </resultMap>
+    <sql id="property">
+        user_name,phone,password,job_id,number,department_id,sex,recruit_id,type,create_time,salary
+    </sql>
+    <sql id="admin_property">
+        id,user_name,job_id,job_name,number,department_id,department_name,sex,salary,type,create_time,join_time
+    </sql>
+    <sql id="selectPhone">
+        id,number,user_name,phone,password,type
+    </sql>
+
+    <resultMap id="userMap" type="user">
+        <id property="id" column="id"></id>
+        <result column="user_name" property="userName"/>
+        <result column="phone" property="phone"/>
+        <result column="password" property="password"/>
+        <result column="job_id" property="jobId"/>
+        <result column="job_name" property="jobName"/>
+        <result column="number" property="number"/>
+        <result column="department_id" property="departmentId"/>
+        <result column="department_name" property="departmentName"/>
+        <result column="sex" property="sex"/>
+        <result column="recruit_id" property="recruitId"/>
+        <result column="type" property="type"/>
+        <result column="create_time" property="createTime"/>
+        <result column="join_time" property="joinTime"/>
+        <result column="image" property="image"/>
+        <result column="salary" property="salary"/>
+    </resultMap>
+
+
+    <select id="getUserByPhone" resultMap="userMap">
+          select <include refid="selectPhone"/> from user where phone=#{phone}
+    </select>
+
+    <select id="getUserByDepId" resultMap="userMap">
+        select <include refid="selectPhone"/> from user where department_id=#{id}
+    </select>
+    <select id="getUserByJobId" resultMap="userMap">
+        select <include refid="selectPhone"/> from user where job_id=#{id}
+    </select>
+    <select id="getUserById" resultMap="userMap">
+        select * from user where id=#{id}
+    </select>
+
+    <update id="updateUser" parameterType="user">
+        update user
+        <set>
+            <if test="number !=null">number=#{number},</if>
+            <if test="salary !=null">salary=#{salary},</if>
+            <if test="departmentId !=null">
+                department_id=#{departmentId},
+                <if test="departmentName !=null">department_name=#{departmentName},
+                </if>
+                <if test="jobId !=null">
+                    job_id=#{jobId},
+                    <if test="jobName !=null">job_name=#{jobName},</if>
+                </if>
+            </if>
+            <if test="type !=null">type=#{type},</if>
+            <if test="joinTime !=null">join_time=#{joinTime},</if>
+            <if test="recruitId !=null">recruit_id=#{recruitId},</if>
+        </set>
+        where id=#{id}
+    </update>
+    <update id="u_updateUser" parameterType="user">
+        update user
+        <set>
+            <if test="userName !=null and userName!=''">user_name=#{userName},</if>
+            <if test="password !=null and password!=''">password=#{password},</if>
+            <if test="image !=null and image!=''">image=#{image},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <insert id="addUser" parameterType="user">
+        insert into user(<include refid="property" />) values(#{userName},#{phone},#{password},#{jobId},#{number},#{departmentId},#{sex},#{recruitId},#{type},#{createTime},#{salary})
+    </insert>
+
+    <select id="getUserBySearch" parameterType="cn.bluegod.base.SearchUserCondition" resultMap="userMap">
+        select <include refid="admin_property"/> from user
+        <where>
+            <if test="type!=null">and type=#{type}</if>
+            <if test="departmentId!=null">and department_id=#{departmentId}</if>
+            <if test="jobId!=null">and job_id=#{jobId}</if>
+            <if test="name!=null and name!=''">
+                <bind name="name_c" value="'%'+name+'%'"/>
+                and user_name like #{name_c}</if>
+        </where>
+    </select>
+
+    <select id="getUserByIds" resultMap="userMap">
+        select <include refid="selectPhone"/> from user where id in
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+</mapper>

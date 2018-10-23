@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bluegod.dao.AwardPenaltyMapper">
+    <insert id="addAwardPenalty" parameterType="awardPenalty">
+        insert into awardPenalty(uId,startTime,money,reason) values(#{uId},#{startTime},#{money},#{reason})
+    </insert>
+
+    <update id="updateAwardPenalty" parameterType="awardPenalty">
+        update awardPenalty
+        <set>
+            <if test="startTime!=null">startTime=#{startTime},</if>
+            <if test="money!=null">money=#{money},</if>
+            <if test="reason!=null">reason=#{reason},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="deleteAwardPenalty">
+        delete from awardPenalty where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getAwardPenaltyById" resultType="awardPenalty">
+        select * from awardPenalty where id=#{id}
+    </select>
+
+    <select id="getAwardPenaltyByuId" resultType="awardPenalty">
+        select * from awardPenalty where uId=#{uId}
+        <if test="start!=null">and startTime &gt;= #{start} </if>
+        <if test="end!=null">and startTime  &lt;= #{end} </if>
+    </select>
+</mapper>

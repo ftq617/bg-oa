@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bluegod.dao.JobMapper">
+
+    <select id="getJobById" resultType="job">
+        select * from job where id=#{id}
+    </select>
+
+    <select id="getJobByDepId" resultType="job">
+        select * from job where depId=#{id}
+    </select>
+
+    <select id="getJobByStatus" resultType="job">
+        select * from job where depId=#{depId} and status=#{status}
+    </select>
+    <select id="getJobByName" resultType="job">
+        select * from job where jobName = #{name};
+    </select>
+    <select id="getJobByJobName" resultType="job">
+        <bind name="jb" value="'%'+_parameter+'%'"/>
+        select * from job where jobName like #{jb};
+    </select>
+
+    <insert id="addJob" parameterType="job" keyProperty="id" useGeneratedKeys="true">
+        insert into job(jobName,depId,depName,createTime,status) values(#{jobName},#{depId},#{depName},#{createTime},#{status})
+    </insert>
+
+    <update id="updateJob" parameterType="job">
+        update job
+        <set>
+            <if test="jobName!=null and jobName!=''">jobName=#{jobName},</if>
+            <if test="depId!=null and depId!=0">depId=#{depId},</if>
+            <if test="depName!=null and depName!=''">depName=#{depName},</if>
+            <if test="status!=null and status!=0">status=#{status},</if>
+        </set>
+        where id=#{id}
+    </update>
+    
+    <delete id="deleteJob">
+        delete from job where id in
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

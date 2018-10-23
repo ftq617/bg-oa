@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bluegod.dao.RecruitMapper">
+
+    <resultMap id="recruitMap" type="recruit">
+        <id column="id" property="id"/>
+        <result property="title" column="title"/>
+        <result property="describes" column="describes"/>
+        <result property="salary" column="salary"/>
+        <result property="pNumber" column="pNumber"/>
+        <result property="hNumber" column="hNumber"/>
+        <result property="endTime" column="end_time"/>
+        <result property="status" column="status"/>
+        <association property="department" javaType="department">
+            <id property="id" column="dId"/>
+            <result property="dName" column="dName"/>
+            <result property="uId" column="uId"/>
+            <result property="uName" column="uName"/>
+            <result property="createTime" column="createTime"/>
+            <result property="status" column="status"/>
+        </association>
+        <association property="user" javaType="user">
+            <id property="id" column="uId"/>
+            <result column="user_name" property="userName"/>
+            <result column="phone" property="phone"/>
+            <result column="job_id" property="jobId"/>
+            <result column="job_name" property="jobName"/>
+            <result column="number" property="number"/>
+            <result column="department_id" property="departmentId"/>
+            <result column="department_name" property="departmentName"/>
+            <result column="sex" property="sex"/>
+            <result column="recruit_id" property="recruitId"/>
+            <result column="type" property="type"/>
+            <result column="create_time" property="createTime"/>
+            <result column="join_time" property="joinTime"/>
+            <result column="image" property="image"/>
+            <result column="salary" property="salary"/>
+        </association>
+    </resultMap>
+
+    <sql id="table">recruit r,user u,department d</sql>
+    <sql id="lianxi" >r.dId=d.id and r.uId=u.id</sql>
+    <sql id="user_property">u.id,u.user_name,u.job_name,u.image</sql>
+
+    <insert id="addRecruit" parameterType="recruit">
+        insert into recruit(title,dId,uId,describes,salary,pNumber,hNumber,end_time,status) values(#{title},#{department.id},#{user.id},#{describes},#{salary},#{pNumber},#{hNumber},#{endTime},#{status})
+    </insert>
+    <update id="updateRecruit" parameterType="recruit">
+        update recruit
+        <set>
+            <if test="title!=null and title!=''">title=#{title},</if>
+            <if test="department!=null and department.id!=null">dId=#{department.id},</if>
+            <if test="user!=null and user.id!=null">uId=#{user.id},</if>
+            <if test="describes!=null and describes !=''">describes=#{describes},</if>
+            <if test="salary!=null">salary=#{salary},</if>
+            <if test="pNumber!=null">pNumber=#{pNumber},</if>
+            <if test="hNumber!=null">hNumber=#{hNumber},</if>
+            <if test="endTime!=null">end_time=#{endTime},</if>
+            <if test="status!=null">status=#{status},</if>
+        </set>
+        where id=#{id}
+    </update>
+    <delete id="deleteRecruit" >
+        delete from recruit where id in
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getRecruitById" resultMap="recruitMap">
+        select r.*,d.*,<include refid="user_property"/> from <include refid="table"/> where <include refid="lianxi"/>
+        and r.id=#{id}
+    </select>
+
+
+    <select id="getRecruitList" parameterType="recruit" resultMap="recruitMap">
+      select r.*,d.*,<include refid="user_property"/> from <include refid="table"/> where <include refid="lianxi"/>
+        <if test="department!=null and department.id!=null">and dId=#{department.id}</if>
+        <if test="user!=null and user.id!=null">and uId=#{user.id}</if>
+        <if test="pNumber!=null ">and pNumber=#{pNumber}</if>
+        <if test="hNumber!=null">and hNumber=#{hNumber}</if>
+        <if test="status=null">and status=#{status}</if>
+    </select>
+    <select id="getRecruitListBySalary" parameterType="recruit" resultMap="recruitMap">
+        select r.*,d.*,<include refid="user_property"/> from <include refid="table"/> where <include refid="lianxi"/>
+        <if test="max!=null">and salary &lt;= #{max} </if>
+        <if test="min!=null">and salary &gt;= #{min} </if>
+    </select>
+
+
+
+
+</mapper>

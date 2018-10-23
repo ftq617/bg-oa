@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bluegod.dao.InterviewMapper">
+
+    <resultMap id="interviewMap" type="interview">
+        <id property="id" column="id"/>
+        <result column="uId" property="uId"/>
+        <result column="rctId" property="rctId"/>
+        <result column="isRead" property="isRead"/>
+        <result column="startTime" property="startTime"/>
+        <result column="isInterview" property="isInterview"/>
+        <result column="viewTime" property="viewTime"/>
+        <result column="isEmploy" property="isEmploy"/>
+        <association property="resume" javaType="resume">
+            <id property="id" column="rseId"/>
+            <result property="name" column="name"/>
+            <result property="sex" column="sex"/>
+            <result property="age" column="age"/>
+            <result property="salary" column="salary"/>
+            <result property="education" column="education"/>
+            <result property="phone" column="phone"/>
+            <result property="email" column="email"/>
+            <result property="major" column="major"/>
+            <result property="introduce" column="introduce"/>
+        </association>
+    </resultMap>
+
+    <insert id="addInterview" parameterType="interview">
+        insert into interview(uId,rctId,rseId,isRead,startTime,isInterview,viewTime,isEmploy) values(#{uId},#{rctId},#{resume.id},#{isRead},#{startTime},#{isInterview},#{viewTime},#{isEmploy})
+    </insert>
+
+    <update id="updateInterview" parameterType="interview">
+        update interview
+        <set>
+            <if test="isRead!=null">isRead=#{isRead},</if>
+            <if test="isInterview!=null">isInterview=#{isInterview},<if test="viewTime!=null">viewTime=#{viewTime},</if></if>
+            <if test="isEmploy!=null">isEmploy=#{isEmploy},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="deleteInterview">
+        delete from interview where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getInterviewById" resultMap="interviewMap">
+            select * from interview i,resume r where i.id=#{id} and i.rseId=r.id
+    </select>
+    <select id="getInterviewByuId" resultMap="interviewMap">
+            select * from interview i,resume r where i.rseId=r.id
+        <if test="uId!=null">and i.uId=#{uId}</if>
+        <if test="isInterview!=null">and i.isInterview=#{isInterview}</if>
+        <if test="isEmploy!=null">and i.isEmploy=#{isEmploy}</if>
+    </select>
+
+    <select id="getInterviewByuIdAfter" resultMap="interviewMap">
+        select * from interview i,resume r where i.rseId=r.id and i.uId=#{uId} and( (i.isEmploy=1 or i.isEmploy=2) or (i.isInterview=1 or i.isInterview=2))
+    </select>
+
+    <select id="getInterviewByuIdAndrctId" resultMap="interviewMap">
+            select * from interview i,resume r where i.rctId=#{rctId} and i.uId=#{uId} and i.rseId=r.id
+    </select>
+
+    <select id="getInterviewByRetId" resultMap="interviewMap">
+            select * from interview i,resume r where i.rseId=r.id
+        <if test="rctId!=null">and i.rctId=#{rctId}</if>
+        <if test="isRead!=null">and i.isRead=#{isRead}</if>
+        <if test="isInterview!=null">and i.isInterview=#{isInterview}</if>
+        <if test="isEmploy!=null">and i.isEmploy=#{isEmploy}</if>
+    </select>
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bluegod.dao.UserTrainsMapper">
+
+    <insert id="addUserTrains" parameterType="userTrains">
+        insert into user_trans(u_id,t_id,status) values(#{u_id},#{t_id},#{status})
+    </insert>
+
+    <delete id="deleteUserTrains">
+        delete from user_trans where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <select id="getUserTrainsByU_id" resultType="userTrains">
+        select * from user_trans where u_id=#{u_id} <if test="status !=null">and status=#{status}</if>
+    </select>
+    <select id="getUserTrainsByT_id" resultType="userTrains">
+        select * from user_trans where t_id=#{t_id}<if test="status !=null">and status=#{status}</if>
+    </select>
+    <select id="getUserTrainsByU_idAndT_id" resultType="userTrains">
+        select * from user_trans where u_id=#{u_id} and t_id=#{t_id}<if test="status !=null">and status=#{status}</if>
+    </select>
+    <select id="getUserTrainsById" resultType="userTrains">
+        select * from user_trans where id=#{id}
+    </select>
+
+</mapper>

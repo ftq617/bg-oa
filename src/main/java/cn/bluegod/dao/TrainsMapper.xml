@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bluegod.dao.TrainsMapper">
+
+
+    <resultMap id="trainsMap" type="trains">
+        <id property="id" column="id"/>
+        <result property="content" column="content"/>
+        <result column="startTime" property="startTime"/>
+        <result property="endTime" column="endTime"/>
+        <result column="status" property="status"/>
+        <association property="department" javaType="department">
+            <id property="id" column="depId"/>
+            <result property="dName" column="dName"/>
+            <result property="uId" column="uId"/>
+            <result property="uName" column="uName"/>
+            <result property="createTime" column="createTime"/>
+            <result property="status" column="d_status"/>
+        </association>
+        <association property="job" javaType="job" >
+            <id property="id" column="jobId"/>
+            <result property="jobName" column="jobName"/>
+            <result property="depId" column="depId"/>
+            <result property="depName" column="depName"/>
+            <result property="createTime" column="createTime"/>
+            <result property="status" column="j_status"/>
+        </association>
+    </resultMap>
+
+    <sql id="table">trains t,job j,department d</sql>
+    <sql id="lianxi" >t.depId=d.id and t.jobId=j.id</sql>
+
+    <select id="getTrains" resultMap="trainsMap">
+        select t.*,j.jobName,d.dName  from <include refid="table"/> where <include refid="lianxi"/>
+        <if test="department!=null and department.id!=null">and d.id=#{department.id}</if>
+        <if test="job!=null and job.id!=null">and j.id=#{job.id}</if>
+        <if test="status!=null">and t.status=#{status}</if>
+    </select>
+
+    <select id="getTrainsByIds" resultMap="trainsMap">
+        select t.*,j.jobName,d.dName  from <include refid="table"/> where t.id in
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and <include refid="lianxi"/>
+    </select>
+
+    <select id="getTrainsById" resultMap="trainsMap">
+        select t.*,j.jobName,d.dName  from <include refid="table"/> where t.id=#{id} and <include refid="lianxi"/>
+    </select>
+
+    <insert id="addTrains" parameterType="trains" keyProperty="id" useGeneratedKeys="true">
+        insert into trains(content,depId,jobId,startTime,endTime,status) values(#{content},#{department.id},#{job.id},#{startTime},#{endTime},#{status})
+    </insert>
+
+    <update id="updateTrains" parameterType="trains">
+        update trains
+        <set>
+            <if test="content!=null and content!=''">content=#{content},</if>
+            <if test="department!=null and department.id!=null">depId=#{department.id},</if>
+            <if test="job!=null and job.id!=null">jobId=#{job.id},</if>
+            <if test="startTime!=null ">startTime=#{startTime},</if>
+            <if test="endTime!=null ">endTime=#{endTime},</if>
+            <if test="status!=null">status=#{status},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="deleteTrains" >
+            delete from trains where id in
+            <foreach item="id" collection="list" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+    </delete>
+
+
+
+</mapper>
